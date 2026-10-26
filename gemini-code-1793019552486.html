@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOOST MATH - สถาบันกวดวิชาคณิตศาสตร์และวิทยาศาสตร์</title>
+
+  <!-- Google Fonts: Prompt & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif'],
+            display: ['Kanit', 'sans-serif'],
+          },
+          colors: {
+            boost: {
+              blue: 'var(--color-primary, #0284c7)',
+              lightBlue: 'var(--color-primary-light, #38bdf8)',
+              gold: 'var(--color-accent, #f59e0b)',
+              yellow: '#fbbf24',
+              navy: '#1e2530',
+              dark: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --color-primary: #0284c7;
+      --color-primary-light: #38bdf8;
+      --color-accent: #f59e0b;
+    }
+
+    body {
+      font-family: 'Prompt', sans-serif;
+    }
+
+    /* ไฮไลต์สำหรับการแก้ไขแบบ Inline เมื่อเปิดโหมดแอดมิน */
+    body.admin-edit-mode [data-editable="true"] {
+      outline: 2px dashed rgba(2, 132, 199, 0.65);
+      outline-offset: 4px;
+      border-radius: 6px;
+      cursor: text;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    body.admin-edit-mode [data-editable="true"]:hover,
+    body.admin-edit-mode [data-editable="true"]:focus {
+      outline: 2px solid #f59e0b;
+      background-color: rgba(245, 158, 11, 0.08);
+    }
+
+    /* ปุ่มเปลี่ยนรูปในโหมดแอดมิน */
+    .img-edit-overlay {
+      display: none;
+    }
+    body.admin-edit-mode .img-edit-wrapper:hover .img-edit-overlay,
+    body.admin-edit-mode .img-edit-overlay.always-show-mobile {
+      display: flex;
+    }
+
+    /* ซ่อนปุ่มจัดการของแอดมินเมื่อไม่ได้อยู่ในโหมดแก้ไข */
+    .admin-only-control {
+      display: none !important;
+    }
+    body.admin-edit-mode .admin-only-control {
+      display: inline-flex !important;
+    }
+    body.admin-edit-mode .admin-only-block {
+      display: block !important;
+    }
+
+    /* Text Stroke เลียนแบบโลโก้ BOOST MATH */
+    .logo-text-shadow {
+      text-shadow: 0 3px 0 #0369a1, 0 5px 10px rgba(0,0,0,0.25);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 dark:bg-[#131822] dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col pb-20 md:pb-0">
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-white/90 dark:bg-[#1e2530]/95 border-b border-slate-200 dark:border-slate-700/80 shadow-sm transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- โลโก้ + ชื่อสถาบัน -->
+      <div class="flex items-center gap-3">
+        <div class="relative img-edit-wrapper w-14 h-14 rounded-full overflow-hidden border-2 border-boost-gold shadow-md bg-[#1e2530] shrink-0 cursor-pointer" onclick="if(!isEditMode) navigatePage('home')">
+          <img id="site-logo-img" src="logo.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3426/3426653.png'" alt="BOOST MATH Logo" class="w-full h-full object-cover" />
+          <button onclick="triggerImageUpload('logo')" class="img-edit-overlay always-show-mobile absolute inset-0 bg-black/60 text-white text-[10px] font-medium items-center justify-center flex-col gap-0.5">
+            <i class="fa-solid fa-camera text-amber-400"></i>
+            <span>เปลี่ยนโลโก้</span>
+          </button>
+        </div>
+        <div class="cursor-pointer" onclick="if(!isEditMode) navigatePage('home')">
+          <div class="flex items-center gap-1.5 font-display font-extrabold text-2xl tracking-tight leading-none">
+            <span id="brand-title-1" data-editable="true" data-path="brand.title1" class="text-boost-blue dark:text-sky-400">BOOST</span>
+            <span id="brand-title-2" data-editable="true" data-path="brand.title2" class="text-boost-gold">MATH</span>
+          </div>
+          <p id="brand-tagline" data-editable="true" data-path="brand.tagline" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            สถาบันกวดวิชาคณิตศาสตร์ เปลี่ยนเรื่องยากให้เป็นเรื่องง่าย
+          </p>
+        </div>
+      </div>
+
+      <!-- เมนูหลักสำหรับหน้าจอคอมพิวเตอร์ (Desktop Menu) -->
+      <nav class="hidden md:flex items-center gap-1 lg:gap-2">
+        <button onclick="navigatePage('home')" data-nav="home" class="nav-btn px-4 py-2 rounded-xl font-medium text-sm transition-all">
+          <i class="fa-solid fa-house mr-1.5"></i>หน้าแรก
+        </button>
+        <button onclick="navigatePage('courses')" data-nav="courses" class="nav-btn px-4 py-2 rounded-xl font-medium text-sm transition-all">
+          <i class="fa-solid fa-book-open mr-1.5"></i>คอร์สเรียน
+        </button>
+        <button onclick="navigatePage('teachers')" data-nav="teachers" class="nav-btn px-4 py-2 rounded-xl font-medium text-sm transition-all">
+          <i class="fa-solid fa-chalkboard-user mr-1.5"></i>คุณครู
+        </button>
+        <button onclick="navigatePage('contact')" data-nav="contact" class="nav-btn px-4 py-2 rounded-xl font-medium text-sm transition-all">
+          <i class="fa-solid fa-headset mr-1.5"></i>ติดต่อเรา
+        </button>
+      </nav>
+
+      <!-- ปุ่มปรับธีมสว่าง/มืด + ไอคอนเข้าสู่ระบบ -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- ปุ่มสลับธีม สว่าง / มืด -->
+        <button onclick="toggleTheme()" id="theme-toggle-btn" title="ปรับธีมสว่าง/มืด" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition text-sm font-medium">
+          <i id="theme-icon" class="fa-solid fa-sun text-amber-500 text-base"></i>
+          <span id="theme-label" class="hidden sm:inline text-xs">ธีมสว่าง</span>
+        </button>
+
+        <!-- ไอคอนเข้าสู่ระบบแอดมิน -->
+        <button onclick="handleAdminButtonClick()" id="admin-login-btn" title="เข้าสู่ระบบแอดมิน" class="relative flex items-center gap-2 px-3.5 py-2 rounded-xl bg-boost-navy text-white dark:bg-sky-600 hover:opacity-95 transition text-sm font-medium shadow-sm">
+          <i id="admin-icon" class="fa-solid fa-user-shield"></i>
+          <span id="admin-btn-text" class="hidden sm:inline text-xs">แอดมิน</span>
+          <span id="admin-status-dot" class="hidden w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping absolute -top-1 -right-1"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- เมนูสำหรับโทรศัพท์มือถือ (Mobile Bottom/Top Responsive Bar) -->
+    <div class="flex md:hidden border-t border-slate-200 dark:border-slate-700/80 bg-white/95 dark:bg-[#1e2530]/95 justify-around py-1.5 px-2">
+      <button onclick="navigatePage('home')" data-nav="home" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg text-xs font-medium">
+        <i class="fa-solid fa-house text-sm mb-0.5"></i>หน้าแรก
+      </button>
+      <button onclick="navigatePage('courses')" data-nav="courses" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg text-xs font-medium">
+        <i class="fa-solid fa-book-open text-sm mb-0.5"></i>คอร์สเรียน
+      </button>
+      <button onclick="navigatePage('teachers')" data-nav="teachers" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg text-xs font-medium">
+        <i class="fa-solid fa-chalkboard-user text-sm mb-0.5"></i>คุณครู
+      </button>
+      <button onclick="navigatePage('contact')" data-nav="contact" class="nav-btn flex flex-col items-center py-1 px-3 rounded-lg text-xs font-medium">
+        <i class="fa-solid fa-headset text-sm mb-0.5"></i>ติดต่อเรา
+      </button>
+    </div>
+  </header>
+
+  <!-- แถบแจ้งเตือนสถานะโหมดแก้ไข (แสดงเฉพาะตอนล็อกอินแอดมิน) -->
+  <div id="admin-top-banner" class="hidden bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-slate-950 px-4 py-2 text-xs sm:text-sm font-semibold shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="bg-slate-900 text-amber-400 px-2 py-0.5 rounded-md text-xs font-bold">ADMIN MODE</span>
+        <span>คลิกที่ข้อความใดก็ได้บนหน้าเว็บเพื่อพิมพ์แก้ไข หรือคลิกที่รูปภาพเพื่ออัปโหลดรูปใหม่</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openDesignModal()" class="bg-white/90 hover:bg-white text-slate-900 px-3 py-1 rounded-lg text-xs font-bold shadow-sm transition">
+          <i class="fa-solid fa-palette mr-1"></i>ปรับสี/ตั้งค่าฐานข้อมูล
+        </button>
+        <button onclick="saveAllToCloud()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-sm transition">
+          <i class="fa-solid fa-cloud-arrow-up mr-1"></i>บันทึกทั้งหมด
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN CONTENT CONTAINER ================= -->
+  <main class="flex-grow">
+
+    <!-- ================= 1. หน้าแรก (HOME PAGE) ================= -->
+    <section id="page-home" class="page-section">
+      <!-- Hero Banner -->
+      <div class="relative overflow-hidden bg-gradient-to-br from-[#1e2530] via-[#17253b] to-[#0c4a6e] text-white py-14 lg:py-20">
+        <!-- ลวดลายตกแต่งพื้นหลัง -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-boost-gold/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            
+            <!-- ข้อความฝั่งซ้าย -->
+            <div class="lg:col-span-7 text-center lg:text-left">
+              <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-xs sm:text-sm font-semibold mb-5">
+                <i class="fa-solid fa-rocket"></i>
+                <span data-editable="true" data-path="home.heroBadge">เปิดรับสมัครนักเรียนใหม่ เทอมนี้รับส่วนลดพิเศษ!</span>
+              </div>
+
+              <h1 data-editable="true" data-path="home.heroTitle" class="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl leading-tight mb-5">
+                ปลดล็อกพลังคณิตศาสตร์ พุ่งทะยานสู่เกรด 4 ไปกับ <span class="text-amber-400">BOOST MATH</span>
+              </h1>
+
+              <p data-editable="true" data-path="home.heroSubtitle" class="text-slate-200 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed">
+                เรียนสนุก เข้าใจง่ายตั้งแต่พื้นฐานจนถึงโจทย์แข่งขัน ด้วยเทคนิคคิดลัดและการดูแลอย่างใกล้ชิดรายบุคคล ปรับพื้นฐานแน่น เพิ่มเกรดในโรงเรียน และพิชิตสนามสอบเข้าชั้นนำ
+              </p>
+
+              <div class="flex flex-wrap justify-center lg:justify-start gap-4">
+                <button onclick="if(!isEditMode) navigatePage('courses')" class="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold text-base shadow-lg shadow-amber-500/25 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                  <i class="fa-solid fa-graduation-cap"></i>
+                  <span data-editable="true" data-path="home.ctaPrimary">ดูคอร์สเรียนทั้งหมด</span>
+                </button>
+                <button onclick="if(!isEditMode) navigatePage('contact')" class="px-7 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold text-base backdrop-blur-sm transition flex items-center gap-2">
+                  <i class="fa-solid fa-comment-dots text-sky-400"></i>
+                  <span data-editable="true" data-path="home.ctaSecondary">ทดลองเรียนฟรี / สอบถาม</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- รูปภาพ Hero ฝั่งขวา -->
+            <div class="lg:col-span-5 flex justify-center">
+              <div class="relative img-edit-wrapper w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-3xl p-3 bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
+                <img id="home-hero-img" src="logo.jpg" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80'" alt="BOOST MATH Banner" class="w-full h-full object-contain rounded-2xl bg-[#1e2530]" />
+                <button onclick="triggerImageUpload('hero')" class="img-edit-overlay always-show-mobile absolute inset-3 rounded-2xl bg-black/65 text-white font-semibold items-center justify-center flex-col gap-2">
+                  <i class="fa-solid fa-cloud-arrow-up text-3xl text-amber-400"></i>
+                  <span>คลิกเพื่อเปลี่ยนรูปแบนเนอร์หลัก</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- แถบสถิติความสำเร็จ (Stats Bar) -->
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 -mt-8 relative z-20">
+        <div id="stats-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-white dark:bg-[#1e2530] p-6 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700">
+          <!-- Render จาก JS -->
+        </div>
+      </div>
+
+      <!-- จุดเด่นของสถาบัน (Why Choose Us) -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+          <div>
+            <span data-editable="true" data-path="home.featureTag" class="text-boost-blue dark:text-sky-400 font-bold text-sm uppercase tracking-wider">WHY BOOST MATH?</span>
+            <h2 data-editable="true" data-path="home.featureHeading" class="font-display font-bold text-2xl sm:text-4xl mt-1">
+              ทำไมผู้ปกครองและนักเรียนจึงไว้วางใจเรา
+            </h2>
+          </div>
+          <button onclick="addFeatureCard()" class="admin-only-control items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow">
+            <i class="fa-solid fa-plus"></i> เพิ่มจุดเด่นใหม่
+          </button>
+        </div>
+
+        <div id="features-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Render จาก JS -->
+        </div>
+      </div>
+
+      <!-- แบนเนอร์โปรโมชั่น / ข่าวสารหน้าแรก -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div class="rounded-3xl bg-gradient-to-r from-sky-600 to-blue-700 dark:from-sky-800 dark:to-slate-900 p-8 sm:p-10 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div class="space-y-2 text-center lg:text-left">
+            <span data-editable="true" data-path="home.promoTag" class="inline-block px-3 py-1 rounded-lg bg-amber-400 text-slate-950 font-bold text-xs">โปรโมชั่นประจำเดือน</span>
+            <h3 data-editable="true" data-path="home.promoTitle" class="font-display font-bold text-2xl sm:text-3xl">
+              สมัครแพ็กคู่ หรือชวนเพื่อนมาเรียน รับส่วนลดทันทีคนละ 500 บาท!
+            </h3>
+            <p data-editable="true" data-path="home.promoDesc" class="text-sky-100 text-sm sm:text-base">
+              พร้อมรับฟรี! เอกสารประกอบการเรียนพิมพ์สี และชุดแบบฝึกหัดเก็งข้อสอบปลายภาค
+            </p>
+          </div>
+          <button onclick="if(!isEditMode) navigatePage('contact')" class="shrink-0 px-7 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-base shadow-lg transition">
+            <span data-editable="true" data-path="home.promoBtn">รับสิทธิ์โปรโมชั่นเลย</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2. หน้าคอร์สเรียน (COURSES PAGE) ================= -->
+    <section id="page-courses" class="page-section hidden py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <span data-editable="true" data-path="coursesPage.tag" class="text-boost-blue dark:text-sky-400 font-bold text-sm uppercase tracking-wider">OUR COURSES</span>
+            <h1 data-editable="true" data-path="coursesPage.title" class="font-display font-bold text-3xl sm:text-4xl mt-1">
+              คอร์สเรียนคุณภาพ ออกแบบเพื่อนักเรียนทุกระดับชั้น
+            </h1>
+            <p data-editable="true" data-path="coursesPage.subtitle" class="text-slate-600 dark:text-slate-400 mt-2">
+              เลือกคอร์สเรียนที่เหมาะกับระดับชั้นและเป้าหมายของน้องๆ สามารถเรียนได้ทั้งแบบกลุ่มเล็กและตัวต่อตัว
+            </p>
+          </div>
+          <button onclick="openCourseModal()" class="admin-only-control items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shrink-0">
+            <i class="fa-solid fa-plus-circle"></i> เพิ่มคอร์สเรียนใหม่
+          </button>
+        </div>
+
+        <!-- ปุ่มกรองระดับชั้น -->
+        <div class="flex flex-wrap gap-2 mb-8">
+          <button onclick="filterCourses('all')" class="course-filter-btn active px-4 py-2 rounded-xl text-sm font-semibold bg-boost-blue text-white transition">ทั้งหมด</button>
+          <button onclick="filterCourses('ประถม')" class="course-filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-boost-blue transition">ระดับประถม</button>
+          <button onclick="filterCourses('ม.ต้น')" class="course-filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-boost-blue transition">ระดับ ม.ต้น</button>
+          <button onclick="filterCourses('ม.ปลาย')" class="course-filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-boost-blue transition">ระดับ ม.ปลาย</button>
+          <button onclick="filterCourses('สอบเข้า')" class="course-filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-boost-blue transition">ติวสอบเข้าเข้มข้น</button>
+        </div>
+
+        <!-- รายการการ์ดคอร์สเรียน -->
+        <div id="courses-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+          <!-- Render จาก JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3. หน้าคุณครู (TEACHERS PAGE) ================= -->
+    <section id="page-teachers" class="page-section hidden py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div>
+            <span data-editable="true" data-path="teachersPage.tag" class="text-boost-blue dark:text-sky-400 font-bold text-sm uppercase tracking-wider">EXPERT TUTORS</span>
+            <h1 data-editable="true" data-path="teachersPage.title" class="font-display font-bold text-3xl sm:text-4xl mt-1">
+              ทีมคุณครูผู้เชี่ยวชาญและใจดีของ BOOST MATH
+            </h1>
+            <p data-editable="true" data-path="teachersPage.subtitle" class="text-slate-600 dark:text-slate-400 mt-2">
+              คุณครูทุกท่านผ่านการคัดเลือก มีเทคนิคการสอนที่เข้าใจง่าย เอาใจใส่นักเรียนทุกคนเหมือนคนในครอบครัว
+            </p>
+          </div>
+          <button onclick="openTeacherModal()" class="admin-only-control items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shrink-0">
+            <i class="fa-solid fa-user-plus"></i> เพิ่มข้อมูลคุณครู
+          </button>
+        </div>
+
+        <div id="teachers-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Render จาก JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 4. หน้าติดต่อเรา (CONTACT PAGE) ================= -->
+    <section id="page-contact" class="page-section hidden py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <span data-editable="true" data-path="contactPage.tag" class="text-boost-blue dark:text-sky-400 font-bold text-sm uppercase tracking-wider">CONTACT US</span>
+          <h1 data-editable="true" data-path="contactPage.title" class="font-display font-bold text-3xl sm:text-4xl mt-1">
+            ติดต่อสอบถาม / สมัครเรียนกับเรา
+          </h1>
+          <p data-editable="true" data-path="contactPage.subtitle" class="text-slate-600 dark:text-slate-400 mt-2">
+            ปรึกษาแนวทางการเรียน วางแผนการติว หรือนัดหมายวัดระดับความรู้ฟรี ไม่มีค่าใช้จ่าย
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- ข้อมูลการติดต่อ & QR Code -->
+          <div class="lg:col-span-5 bg-white dark:bg-[#1e2530] rounded-3xl p-6 sm:p-8 shadow-lg border border-slate-100 dark:border-slate-700 space-y-6">
+            <h3 class="font-display font-bold text-xl flex items-center gap-2">
+              <i class="fa-solid fa-address-card text-boost-gold"></i>
+              <span>ช่องทางการติดต่อโดยตรง</span>
+            </h3>
+
+            <div class="space-y-4">
+              <div class="flex items-start gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70">
+                <div class="w-11 h-11 rounded-xl bg-sky-500/15 text-sky-500 flex items-center justify-center shrink-0 text-lg">
+                  <i class="fa-solid fa-phone-volume"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">เบอร์โทรศัพท์</p>
+                  <p data-editable="true" data-path="contactPage.phone" class="font-semibold text-base">089-XXX-XXXX (ครูพี่บูสต์)</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70">
+                <div class="w-11 h-11 rounded-xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center shrink-0 text-xl">
+                  <i class="fa-brands fa-line"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">LINE Official / ID</p>
+                  <p data-editable="true" data-path="contactPage.lineId" class="font-semibold text-base">@boostmath</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70">
+                <div class="w-11 h-11 rounded-xl bg-blue-600/15 text-blue-500 flex items-center justify-center shrink-0 text-xl">
+                  <i class="fa-brands fa-facebook"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">Facebook Fanpage</p>
+                  <p data-editable="true" data-path="contactPage.facebook" class="font-semibold text-base">BOOST MATH สถาบันสอนคณิตศาสตร์</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70">
+                <div class="w-11 h-11 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0 text-lg">
+                  <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400">สถานที่ตั้งสถาบัน & เวลาทำการ</p>
+                  <p data-editable="true" data-path="contactPage.address" class="font-medium text-sm leading-relaxed">
+                    เปิดบริการ อังคาร - อาทิตย์ (09:00 - 19:00 น.) มีทั้งรอบเรียนสดที่สถาบัน และรอบเรียนสดออนไลน์ผ่าน Zoom
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- รูป QR Code แอดไลน์ -->
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-700 text-center">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3">สแกน QR Code เพื่อปรึกษาคอร์สเรียนทาง LINE</p>
+              <div class="relative img-edit-wrapper w-44 h-44 mx-auto rounded-2xl overflow-hidden border-2 border-dashed border-slate-300 dark:border-slate-600 p-2 bg-white">
+                <img id="contact-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://line.me" alt="LINE QR Code" class="w-full h-full object-contain" />
+                <button onclick="triggerImageUpload('qr')" class="img-edit-overlay always-show-mobile absolute inset-0 bg-black/65 text-white text-xs font-semibold items-center justify-center flex-col gap-1">
+                  <i class="fa-solid fa-qrcode text-2xl text-amber-400"></i>
+                  <span>เปลี่ยนรูป QR Code</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ฟอร์มส่งข้อความ / สมัครเรียน (บันทึกลง Google Sheet ในโฟลเดอร์ Drive) -->
+          <div class="lg:col-span-7 bg-white dark:bg-[#1e2530] rounded-3xl p-6 sm:p-8 shadow-lg border border-slate-100 dark:border-slate-700">
+            <h3 data-editable="true" data-path="contactPage.formTitle" class="font-display font-bold text-2xl mb-2">
+              ลงทะเบียนจองสิทธิ์ทดลองเรียน / สอบถามคอร์ส
+            </h3>
+            <p data-editable="true" data-path="contactPage.formDesc" class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+              กรอกข้อมูลด้านล่าง พี่แอดมินและคุณครูจะติดต่อกลับเพื่อแนะนำคอร์สที่เหมาะสมที่สุดให้ครับ
+            </p>
+
+            <form onsubmit="submitStudentLead(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold mb-1.5">ชื่อ-นามสกุล (นักเรียน หรือ ผู้ปกครอง) *</label>
+                  <input id="lead-name" type="text" required placeholder="เช่น น้องปั้น / คุณแม่สมศรี" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-boost-blue text-sm" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold mb-1.5">เบอร์โทรศัพท์ติดต่อกลับ *</label>
+                  <input id="lead-phone" type="tel" required placeholder="08X-XXX-XXXX" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-boost-blue text-sm" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold mb-1.5">ระดับชั้น หรือ คอร์สที่สนใจ</label>
+                <input id="lead-course" type="text" placeholder="เช่น คณิต ป.4-ป.6 / ติวสอบเข้า ม.1 / คณิต ม.ปลาย" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-boost-blue text-sm" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold mb-1.5">รายละเอียดเพิ่มเติม / เรื่องที่อยากให้คุณครูช่วยเน้น</label>
+                <textarea id="lead-message" rows="4" placeholder="เช่น อยากปรับพื้นฐานเรื่องเศษส่วนและโจทย์ปัญหา หรือต้องการเรียนรอบวันเสาร์-อาทิตย์..." class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-boost-blue text-sm"></textarea>
+              </div>
+
+              <button type="submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-boost-blue to-sky-500 hover:opacity-95 text-white font-bold text-base shadow-lg shadow-sky-500/20 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>ส่งข้อมูลติดต่อสถาบัน</span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-[#1e2530] text-slate-400 py-8 border-t border-slate-800 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm">
+      <div class="flex items-center gap-3">
+        <span class="font-display font-bold text-white text-lg">BOOST <span class="text-amber-400">MATH</span></span>
+        <span data-editable="true" data-path="brand.footerText">© สถาบันกวดวิชาคณิตศาสตร์ BOOST MATH พัฒนาศักยภาพผู้เรียนสู่ความเป็นเลิศ</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="navigatePage('home')" class="hover:text-white transition">หน้าแรก</button>
+        <button onclick="navigatePage('courses')" class="hover:text-white transition">คอร์สเรียน</button>
+        <button onclick="navigatePage('teachers')" class="hover:text-white transition">คุณครู</button>
+        <button onclick="navigatePage('contact')" class="hover:text-white transition">ติดต่อเรา</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Input ซ่อนสำหรับอัปโหลดรูปภาพ -->
+  <input type="file" id="hidden-file-input" accept="image/*" class="hidden" onchange="handleFileSelected(event)" />
+
+  <!-- ================= FLOATING ADMIN TOOLBAR (แสดงเมื่อแอดมินเข้าสู่ระบบ) ================= -->
+  <div id="admin-floating-bar" class="hidden fixed bottom-16 md:bottom-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white px-4 py-2.5 rounded-2xl shadow-2xl border border-amber-400/50 backdrop-blur-md flex items-center gap-2 sm:gap-3 w-[95%] max-w-2xl justify-between">
+    <div class="flex items-center gap-2">
+      <button onclick="toggleEditMode()" id="toggle-edit-btn" class="px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span id="toggle-edit-text">โหมดแก้ไข: เปิด</span>
+      </button>
+      <button onclick="openDesignModal()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium flex items-center gap-1.5">
+        <i class="fa-solid fa-sliders text-sky-400"></i>
+        <span class="hidden sm:inline">ตั้งค่าสี & Drive API</span>
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button onclick="saveAllToCloud()" class="px-4 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 shadow">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>บันทึกข้อมูล</span>
+      </button>
+      <button onclick="logoutAdmin()" title="ออกจากระบบแอดมิน" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white text-xs transition">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC & LIVE CMS ================= -->
+  <script>
+    // ตั้งค่า URL ของ Google Apps Script Web App เริ่มต้น (สามารถตั้งค่าผ่านหน้าเว็บในเมนูแอดมินได้เช่นกัน)
+    const DEFAULT_GAS_WEBAPP_URL = '';
+    const DEFAULT_DRIVE_FOLDER_URL = '';
+
+    // ข้อมูลเริ่มต้นของเว็บไซต์ BOOST MATH (เหมาะกับสถาบันกวดวิชาคณิตศาสตร์)
+    const defaultSiteData = {
+      theme: {
+        primaryColor: '#0284c7',
+        accentColor: '#f59e0b',
+        defaultMode: 'light'
+      },
+      brand: {
+        logoUrl: 'logo.jpg',
+        title1: 'BOOST',
+        title2: 'MATH',
+        tagline: 'สถาบันกวดวิชาคณิตศาสตร์ เปลี่ยนเรื่องยากให้เป็นเรื่องง่าย',
+        footerText: '© สถาบันกวดวิชาคณิตศาสตร์ BOOST MATH พัฒนาศักยภาพผู้เรียนสู่ความเป็นเลิศ'
+      },
+      home: {
+        heroBadge: 'เปิดรับสมัครนักเรียนใหม่ เทอมนี้รับส่วนลดพิเศษ!',
+        heroTitle: 'ปลดล็อกพลังคณิตศาสตร์ พุ่งทะยานสู่เกรด 4 ไปกับ BOOST MATH',
+        heroSubtitle: 'เรียนสนุก เข้าใจง่ายตั้งแต่พื้นฐานจนถึงโจทย์แข่งขัน ด้วยเทคนิคคิดลัดและการดูแลอย่างใกล้ชิดรายบุคคล ปรับพื้นฐานแน่น เพิ่มเกรดในโรงเรียน และพิชิตสนามสอบเข้าชั้นนำ',
+        ctaPrimary: 'ดูคอร์สเรียนทั้งหมด',
+        ctaSecondary: 'ทดลองเรียนฟรี / สอบถาม',
+        heroImg: 'logo.jpg',
+        stats: [
+          { number: '1,500+', label: 'นักเรียนที่ไว้วางใจ' },
+          { number: '96%', label: 'คะแนนสอบและเกรดเพิ่มขึ้น' },
+          { number: '100%', label: 'ดูแลใกล้ชิดกลุ่มเล็ก' },
+          { number: '4.9/5', label: 'ความพึงพอใจจากผู้ปกครอง' }
+        ],
+        featureTag: 'WHY BOOST MATH?',
+        featureHeading: 'ทำไมผู้ปกครองและนักเรียนจึงไว้วางใจเรา',
+        features: [
+          {
+            icon: 'fa-solid fa-wand-magic-sparkles',
+            title: 'เทคนิคคิดเร็ว เข้าใจที่มา ไม่ต้องท่องจำ',
+            desc: 'ปูพื้นฐานให้เห็นภาพจริง พร้อมเทคนิคการตัดช้อยส์และคิดเลขเร็วที่นำไปใช้ทำข้อสอบได้ทันเวลา'
+          },
+          {
+            icon: 'fa-solid fa-users-viewfinder',
+            title: 'ดูแลทั่วถึง รายบุคคล (Small Group & Private)',
+            desc: 'จำกัดจำนวนนักเรียนต่อรอบ คุณครูสามารถตรวจวิธีทำและแก้ไขจุดอ่อนของน้องๆ แต่ละคนได้ทันที'
+          },
+          {
+            icon: 'fa-solid fa-trophy',
+            title: 'คลังข้อสอบอัปเดตใหม่ตรงแนวโรงเรียนดัง',
+            desc: 'รวบรวมแนวข้อสอบเข้า ม.1, ม.4, สสวท., TEDET และ A-Level พร้อมเก็งข้อสอบกลางภาค-ปลายภาคทุกเทอม'
+          }
+        ],
+        promoTag: 'โปรโมชั่นประจำเดือน',
+        promoTitle: 'สมัครแพ็กคู่ หรือชวนเพื่อนมาเรียน รับส่วนลดทันทีคนละ 500 บาท!',
+        promoDesc: 'พร้อมรับฟรี! เอกสารประกอบการเรียนพิมพ์สี และชุดแบบฝึกหัดเก็งข้อสอบปลายภาค',
+        promoBtn: 'รับสิทธิ์โปรโมชั่นเลย'
+      },
+      coursesPage: {
+        tag: 'OUR COURSES',
+        title: 'คอร์สเรียนคุณภาพ ออกแบบเพื่อนักเรียนทุกระดับชั้น',
+        subtitle: 'เลือกคอร์สเรียนที่เหมาะกับระดับชั้นและเป้าหมายของน้องๆ สามารถเรียนได้ทั้งแบบกลุ่มเล็กและตัวต่อตัว',
+        courses: [
+          {
+            id: 'c1',
+            category: 'ประถม',
+            badge: 'ยอดนิยม',
+            title: 'คอร์สคณิตคิดเร็ว & ปรับพื้นฐาน ป.1 - ป.6',
+            price: '2,500 บาท / คอร์ส',
+            schedule: 'เสาร์ หรือ อาทิตย์ (16 ชม./คอร์ส)',
+            desc: 'สร้างความมั่นใจในวิชาคณิตศาสตร์ ฝึกเทคนิคบวกลบคูณหาร เศษส่วน ทศนิยม และการตีความโจทย์ปัญหาอย่างเป็นระบบ',
+            image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80'
+          },
+          {
+            id: 'c2',
+            category: 'สอบเข้า',
+            badge: 'พิชิตห้อง Gifted',
+            title: 'คอร์สตะลุยโจทย์สอบเข้า ม.1 ห้องเรียนพิเศษ & รร.ประจำจังหวัด',
+            price: '3,900 บาท / คอร์ส',
+            schedule: 'เสาร์ - อาทิตย์ (24 ชม./คอร์ส)',
+            desc: 'เจาะลึกข้อสอบแข่งขันย้อนหลัง 10 ปี เทคนิคทำโจทย์ยากให้เสร็จภายใน 1 นาที พร้อมจำลองสนามสอบจริง (Pre-Test)',
+            image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80'
+          },
+          {
+            id: 'c3',
+            category: 'ม.ต้น',
+            badge: 'เพิ่มเกรด 4',
+            title: 'คอร์สคณิตศาสตร์ ม.1 - ม.3 (พื้นฐาน + เพิ่มเติม)',
+            price: '2,900 บาท / คอร์ส',
+            schedule: 'เลือกเวลาเรียนได้ (หลังเลิกเรียน / เสาร์-อาทิตย์)',
+            desc: 'สรุปเนื้อหาเข้มข้นเรื่องสมการ พหุนาม เรขาคณิต ทฤษฎีบทพีทาโกรัส และสถิติ เตรียมพร้อมสอบเก็บคะแนนและสอบเข้า ม.4',
+            image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80'
+          },
+          {
+            id: 'c4',
+            category: 'ม.ปลาย',
+            badge: 'TCAS / A-Level',
+            title: 'คอร์สคณิตศาสตร์ ม.4 - ม.6 & ตะลุยโจทย์ A-Level',
+            price: '3,500 บาท / คอร์ส',
+            schedule: 'เรียนสดกลุ่มเล็ก / ตัวต่อตัว',
+            desc: 'ปูพื้นฐานเซต ตรรกศาสตร์ ฟังก์ชัน แคลคูลัส และความน่าจะเป็น พร้อมเทคนิคเก็บคะแนนสนามสอบ A-Level คณิต 1 และคณิต 2',
+            image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80'
+          }
+        ]
+      },
+      teachersPage: {
+        tag: 'EXPERT TUTORS',
+        title: 'ทีมคุณครูผู้เชี่ยวชาญและใจดีของ BOOST MATH',
+        subtitle: 'คุณครูทุกท่านผ่านการคัดเลือก มีเทคนิคการสอนที่เข้าใจง่าย เอาใจใส่นักเรียนทุกคนเหมือนคนในครอบครัว',
+        teachers: [
+          {
+            id: 't1',
+            name: 'ครูพี่บูสต์ (Head Tutor)',
+            role: 'ผู้เชี่ยวชาญคณิตศาสตร์ประถมปลาย & สอบเข้า ม.1',
+            education: 'ปริญญาตรีศึกษาศาสตร์ เอกคณิตศาสตร์ (เกียรตินิยม)',
+            bio: 'ประสบการณ์สอนมากกว่า 8 ปี เจ้าของนวัตกรรมเทคนิคคิดเลขเร็ว เปลี่ยนเด็กที่ไม่ชอบคณิตให้สอบได้ท็อปของห้อง',
+            image: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=600&q=80'
+          },
+          {
+            id: 't2',
+            name: 'ครูพี่มายด์',
+            role: 'ติวเตอร์คณิตศาสตร์ ม.ต้น & ปรับพื้นฐานประถม',
+            education: 'ปริญญาตรีคณะวิทยาศาสตร์ สาขาคณิตศาสตร์ประยุกต์',
+            bio: 'ใจดี อธิบายละเอียดเป็นขั้นเป็นตอน มีจิตวิทยาในการสร้างแรงบันดาลใจให้น้องๆ กล้าถามและสนุกกับการทำโจทย์',
+            image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80'
+          },
+          {
+            id: 't3',
+            name: 'ครูพี่นนท์',
+            role: 'ติวเตอร์คณิตศาสตร์ ม.ปลาย & A-Level',
+            education: 'ปริญญาตรีวิศวกรรมศาสตร์ มหาวิทยาลัยชั้นนำ',
+            bio: 'เน้นการวิเคราะห์โจทย์ซับซ้อนให้กลายเป็นภาพที่เข้าใจง่าย แชร์เทคนิคการบริหารเวลาในห้องสอบแข่งขันระดับประเทศ',
+            image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'
+          }
+        ]
+      },
+      contactPage: {
+        tag: 'CONTACT US',
+        title: 'ติดต่อสอบถาม / สมัครเรียนกับเรา',
+        subtitle: 'ปรึกษาแนวทางการเรียน วางแผนการติว หรือนัดหมายวัดระดับความรู้ฟรี ไม่มีค่าใช้จ่าย',
+        phone: '089-XXX-XXXX (ครูพี่บูสต์)',
+        lineId: '@boostmath',
+        facebook: 'BOOST MATH สถาบันสอนคณิตศาสตร์',
+        address: 'เปิดบริการ อังคาร - อาทิตย์ (09:00 - 19:00 น.) มีทั้งรอบเรียนสดที่สถาบัน และรอบเรียนสดออนไลน์ผ่าน Zoom',
+        qrImg: 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://line.me',
+        formTitle: 'ลงทะเบียนจองสิทธิ์ทดลองเรียน / สอบถามคอร์ส',
+        formDesc: 'กรอกข้อมูลด้านล่าง พี่แอดมินและคุณครูจะติดต่อกลับเพื่อแนะนำคอร์สที่เหมาะสมที่สุดให้ครับ'
+      }
+    };
+
+    // State ของระบบ
+    let siteData = JSON.parse(JSON.stringify(defaultSiteData));
+    let currentPage = 'home';
+    let currentCourseFilter = 'all';
+    let isAdminLoggedIn = false;
+    let isEditMode = false;
+    let pendingUploadTarget = null; // 'logo', 'hero', 'qr', 'course:idx', 'teacher:idx'
+
+    // ดึงการตั้งค่า GAS URL & Drive Folder URL
+    function getGasUrl() {
+      return localStorage.getItem('boostmath_gas_url') || DEFAULT_GAS_WEBAPP_URL;
+    }
+    function getDriveFolderUrl() {
+      return localStorage.getItem('boostmath_folder_url') || DEFAULT_DRIVE_FOLDER_URL;
+    }
+
+    // เริ่มต้นทำงานเมื่อโหลดหน้าเว็บ
+    window.addEventListener('DOMContentLoaded', async () => {
+      // โหลดจาก LocalStorage ก่อนเพื่อให้แสดงผลทันที
+      const cached = localStorage.getItem('boostmath_site_data');
+      if (cached) {
+        try {
+          siteData = JSON.parse(cached);
+        } catch (e) {}
+      }
+
+      // เช็คสถานะล็อกอินค้างไว้
+      if (sessionStorage.getItem('boostmath_admin') === 'true') {
+        enableAdminSession(false);
+      }
+
+      // ใช้ธีมเริ่มต้น
+      initTheme();
+      applyCustomColors();
+      renderAll();
+      navigatePage('home');
+
+      // หากมีการตั้งค่า GAS URL ไว้ ให้ดึงข้อมูลล่าสุดจาก Google Drive
+      const gasUrl = getGasUrl();
+      if (gasUrl) {
+        await fetchSiteDataFromDrive(gasUrl);
+      }
+    });
+
+    // ดึงข้อมูลจาก Google Drive Folder ผ่าน GAS
+    async function fetchSiteDataFromDrive(gasUrl) {
+      try {
+        const folderUrl = encodeURIComponent(getDriveFolderUrl());
+        const res = await fetch(`${gasUrl}?folderUrl=${folderUrl}`);
+        const json = await res.json();
+        if (json.status === 'success' && json.data) {
+          siteData = json.data;
+          localStorage.setItem('boostmath_site_data', JSON.stringify(siteData));
+          applyCustomColors();
+          renderAll();
+        }
+      } catch (err) {
+        console.warn('ใช้ข้อมูลแคชภายในเครื่อง:', err);
+      }
+    }
+
+    // อัปเดตค่าตัวแปรสี CSS
+    function applyCustomColors() {
+      if (siteData.theme) {
+        document.documentElement.style.setProperty('--color-primary', siteData.theme.primaryColor || '#0284c7');
+        document.documentElement.style.setProperty('--color-accent', siteData.theme.accentColor || '#f59e0b');
+      }
+    }
+
+    // ระบบสลับหน้า (SPA Navigation)
+    function navigatePage(page) {
+      if (isEditMode) syncInlineEditsToState();
+      currentPage = page;
+      document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+      const target = document.getElementById(`page-${page}`);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.dataset.nav === page) {
+          btn.className = btn.className.replace(/text-slate-\d+|hover:bg-slate-\d+/g, '');
+          btn.classList.add('bg-boost-blue', 'text-white', 'shadow-sm');
+        } else {
+          btn.classList.remove('bg-boost-blue', 'text-white', 'shadow-sm');
+          btn.classList.add('text-slate-600', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-800');
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ระบบสลับธีม สว่าง / มืด
+    function initTheme() {
+      const savedTheme = localStorage.getItem('boostmath_theme') || 'light';
+      setTheme(savedTheme);
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'light' : 'dark');
+    }
+
+    function setTheme(mode) {
+      const icon = document.getElementById('theme-icon');
+      const label = document.getElementById('theme-label');
+      if (mode === 'dark') {
+        document.documentElement.classList.add('dark');
+        icon.className = 'fa-solid fa-moon text-sky-400 text-base';
+        label.textContent = 'ธีมมืด';
+      } else {
+        document.documentElement.classList.remove('dark');
+        icon.className = 'fa-solid fa-sun text-amber-500 text-base';
+        label.textContent = 'ธีมสว่าง';
+      }
+      localStorage.setItem('boostmath_theme', mode);
+    }
+
+    // ================= RENDER UI ALL PAGES =================
+    function renderAll() {
+      // โลโก้และรูปภาพหลัก
+      document.getElementById('site-logo-img').src = siteData.brand.logoUrl || 'logo.jpg';
+      document.getElementById('home-hero-img').src = siteData.home.heroImg || siteData.brand.logoUrl || 'logo.jpg';
+      document.getElementById('contact-qr-img').src = siteData.contactPage.qrImg || '';
+
+      // ใส่ข้อความที่มี data-path
+      document.querySelectorAll('[data-path]').forEach(el => {
+        const val = getValueByPath(siteData, el.dataset.path);
+        if (val !== undefined) el.textContent = val;
+      });
+
+      renderStats();
+      renderFeatures();
+      renderCourses();
+      renderTeachers();
+      refreshEditableAttributes();
+    }
+
+    function renderStats() {
+      const container = document.getElementById('stats-grid');
+      container.innerHTML = siteData.home.stats.map((st, idx) => `
+        <div class="text-center p-2">
+          <div data-editable="true" data-path="home.stats.${idx}.number" class="font-display font-extrabold text-2xl sm:text-4xl text-boost-blue dark:text-sky-400">${st.number}</div>
+          <div data-editable="true" data-path="home.stats.${idx}.label" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">${st.label}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderFeatures() {
+      const container = document.getElementById('features-container');
+      container.innerHTML = siteData.home.features.map((ft, idx) => `
+        <div class="relative bg-white dark:bg-[#1e2530] p-7 rounded-3xl shadow-md border border-slate-100 dark:border-slate-700 hover:shadow-xl transition group">
+          <button onclick="deleteFeatureCard(${idx})" title="ลบการ์ดนี้" class="admin-only-control absolute top-4 right-4 w-8 h-8 rounded-full bg-rose-500 text-white items-center justify-center text-xs shadow hover:bg-rose-600">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-boost-blue to-sky-400 text-white flex items-center justify-center text-2xl mb-5 shadow-md shadow-sky-500/20">
+            <i class="${ft.icon || 'fa-solid fa-star'}"></i>
+          </div>
+          <h3 data-editable="true" data-path="home.features.${idx}.title" class="font-display font-bold text-xl mb-2.5">${ft.title}</h3>
+          <p data-editable="true" data-path="home.features.${idx}.desc" class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">${ft.desc}</p>
+        </div>
+      `).join('');
+    }
+
+    function filterCourses(category) {
+      if (isEditMode) syncInlineEditsToState();
+      currentCourseFilter = category;
+      document.querySelectorAll('.course-filter-btn').forEach(btn => {
+        if (btn.textContent.includes(category) || (category === 'all' && btn.textContent === 'ทั้งหมด')) {
+          btn.className = 'course-filter-btn active px-4 py-2 rounded-xl text-sm font-semibold bg-boost-blue text-white transition';
+        } else {
+          btn.className = 'course-filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-boost-blue transition';
+        }
+      });
+      renderCourses();
+      refreshEditableAttributes();
+    }
+
+    function renderCourses() {
+      const container = document.getElementById('courses-container');
+      const list = siteData.coursesPage.courses
+        .map((c, originalIndex) => ({ ...c, originalIndex }))
+        .filter(c => currentCourseFilter === 'all' || c.category === currentCourseFilter);
+
+      container.innerHTML = list.map(c => {
+        const idx = c.originalIndex;
+        return `
+        <div class="bg-white dark:bg-[#1e2530] rounded-3xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-700 flex flex-col justify-between group hover:shadow-xl transition">
+          <div>
+            <div class="relative img-edit-wrapper h-52 overflow-hidden bg-slate-900">
+              <img src="${c.image}" alt="${c.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <span data-editable="true" data-path="coursesPage.courses.${idx}.badge" class="absolute top-3 left-3 px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-bold text-xs shadow">
+                ${c.badge}
+              </span>
+              <span data-editable="true" data-path="coursesPage.courses.${idx}.category" class="absolute top-3 right-3 px-3 py-1 rounded-full bg-slate-900/80 text-sky-300 font-semibold text-xs backdrop-blur-sm">
+                ${c.category}
+              </span>
+              <button onclick="triggerImageUpload('course:${idx}')" class="img-edit-overlay always-show-mobile absolute inset-0 bg-black/60 text-white font-semibold items-center justify-center flex-col gap-1">
+                <i class="fa-solid fa-camera text-2xl text-amber-400"></i>
+                <span class="text-xs">เปลี่ยนรูปคอร์สเรียน</span>
+              </button>
+            </div>
+
+            <div class="p-6">
+              <h3 data-editable="true" data-path="coursesPage.courses.${idx}.title" class="font-display font-bold text-xl mb-2 leading-snug">
+                ${c.title}
+              </h3>
+              <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-3">
+                <i class="fa-regular fa-clock text-boost-blue"></i>
+                <span data-editable="true" data-path="coursesPage.courses.${idx}.schedule">${c.schedule}</span>
+              </div>
+              <p data-editable="true" data-path="coursesPage.courses.${idx}.desc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                ${c.desc}
+              </p>
+            </div>
+          </div>
+
+          <div class="px-6 pb-6 pt-3 border-t border-slate-100 dark:border-slate-700/70 flex items-center justify-between gap-2">
+            <div>
+              <span class="text-[11px] text-slate-400 block">ค่าเล่าเรียน</span>
+              <span data-editable="true" data-path="coursesPage.courses.${idx}.price" class="font-display font-extrabold text-lg text-boost-blue dark:text-amber-400">
+                ${c.price}
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="deleteCourse(${idx})" class="admin-only-control px-3 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+              <button onclick="if(!isEditMode) selectCourseToApply('${c.title.replace(/'/g, "\\'")}')" class="px-4 py-2.5 rounded-xl bg-boost-navy dark:bg-sky-600 hover:opacity-90 text-white text-xs font-bold transition">
+                สมัครเรียนคอร์สนี้
+              </button>
+            </div>
+          </div>
+        </div>
+      `}).join('');
+    }
+
+    function renderTeachers() {
+      const container = document.getElementById('teachers-container');
+      container.innerHTML = siteData.teachersPage.teachers.map((t, idx) => `
+        <div class="relative bg-white dark:bg-[#1e2530] rounded-3xl p-6 shadow-lg border border-slate-100 dark:border-slate-700 text-center flex flex-col items-center hover:shadow-xl transition">
+          <button onclick="deleteTeacher(${idx})" title="ลบข้อมูลคุณครู" class="admin-only-control absolute top-4 right-4 w-8 h-8 rounded-full bg-rose-500 text-white items-center justify-center text-xs shadow hover:bg-rose-600">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+
+          <div class="relative img-edit-wrapper w-32 h-32 rounded-full overflow-hidden border-4 border-boost-gold shadow-lg mb-4 bg-slate-200">
+            <img src="${t.image}" alt="${t.name}" class="w-full h-full object-cover" />
+            <button onclick="triggerImageUpload('teacher:${idx}')" class="img-edit-overlay always-show-mobile absolute inset-0 bg-black/60 text-white text-xs font-semibold items-center justify-center flex-col gap-1">
+              <i class="fa-solid fa-camera text-amber-400 text-lg"></i>
+              <span>เปลี่ยนรูปครู</span>
+            </button>
+          </div>
+
+          <h3 data-editable="true" data-path="teachersPage.teachers.${idx}.name" class="font-display font-bold text-xl text-slate-900 dark:text-white">
+            ${t.name}
+          </h3>
+          <p data-editable="true" data-path="teachersPage.teachers.${idx}.role" class="text-xs font-semibold text-boost-blue dark:text-amber-400 mt-1 mb-3">
+            ${t.role}
+          </p>
+          <div class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 text-xs text-slate-600 dark:text-slate-300 font-medium mb-3">
+            <i class="fa-solid fa-graduation-cap text-boost-gold mr-1"></i>
+            <span data-editable="true" data-path="teachersPage.teachers.${idx}.education">${t.education}</span>
+          </div>
+          <p data-editable="true" data-path="teachersPage.teachers.${idx}.bio" class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            ${t.bio}
+          </p>
+        </div>
+      `).join('');
+    }
+
+    // ================= ADMIN LOGIN & INLINE EDITING SYSTEM =================
+    function handleAdminButtonClick() {
+      if (isAdminLoggedIn) {
+        toggleEditMode();
+      } else {
+        Swal.fire({
+          title: 'เข้าสู่ระบบผู้ดูแลเว็บไซต์',
+          html: `
+            <div class="text-left space-y-3 mt-2">
+              <div>
+                <label class="text-xs font-semibold text-slate-600">ชื่อผู้ใช้ (Username)</label>
+                <input id="swal-user" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm mt-1" placeholder="admin">
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-slate-600">รหัสผ่าน (Password)</label>
+                <input id="swal-pass" type="password" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm mt-1" placeholder="•••">
+              </div>
+            </div>
+          `,
+          confirmButtonText: 'เข้าสู่ระบบ',
+          confirmButtonColor: '#0284c7',
+          showCancelButton: true,
+          cancelButtonText: 'ยกเลิก',
+          preConfirm: () => {
+            const u = document.getElementById('swal-user').value.trim();
+            const p = document.getElementById('swal-pass').value.trim();
+            if (u === 'admin' && p === '123') return true;
+            Swal.showValidationMessage('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง (ใช้ admin / 123)');
+            return false;
+          }
+        }).then(res => {
+          if (res.isConfirmed) {
+            sessionStorage.setItem('boostmath_admin', 'true');
+            enableAdminSession(true);
+          }
+        });
+      }
+    }
+
+    function enableAdminSession(showAlert = true) {
+      isAdminLoggedIn = true;
+      isEditMode = true;
+      document.body.classList.add('admin-edit-mode');
+      document.getElementById('admin-top-banner').classList.remove('hidden');
+      document.getElementById('admin-floating-bar').classList.remove('hidden');
+      document.getElementById('admin-status-dot').classList.remove('hidden');
+      document.getElementById('admin-btn-text').textContent = 'กำลังแก้ไข';
+      refreshEditableAttributes();
+
+      if (showAlert) {
+        Swal.fire({
+          icon: 'success',
+          title: 'เข้าสู่โหมดแอดมินสำเร็จ!',
+          text: 'คุณสามารถคลิกแก้ไขข้อความ เปลี่ยนรูปภาพ หรือเพิ่มคอร์สเรียนและคุณครูบนหน้าเว็บได้ทันที',
+          timer: 2200,
+          showConfirmButton: false
+        });
+      }
+    }
+
+    function toggleEditMode() {
+      syncInlineEditsToState();
+      isEditMode = !isEditMode;
+      const btnText = document.getElementById('toggle-edit-text');
+      const btn = document.getElementById('toggle-edit-btn');
+      if (isEditMode) {
+        document.body.classList.add('admin-edit-mode');
+        btnText.textContent = 'โหมดแก้ไข: เปิด';
+        btn.className = 'px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5';
+      } else {
+        document.body.classList.remove('admin-edit-mode');
+        btnText.textContent = 'โหมดดูตัวอย่าง';
+        btn.className = 'px-3 py-1.5 rounded-xl bg-slate-700 text-white font-bold text-xs flex items-center gap-1.5';
+      }
+      refreshEditableAttributes();
+    }
+
+    function logoutAdmin() {
+      syncInlineEditsToState();
+      isAdminLoggedIn = false;
+      isEditMode = false;
+      sessionStorage.removeItem('boostmath_admin');
+      document.body.classList.remove('admin-edit-mode');
+      document.getElementById('admin-top-banner').classList.add('hidden');
+      document.getElementById('admin-floating-bar').classList.add('hidden');
+      document.getElementById('admin-status-dot').classList.add('hidden');
+      document.getElementById('admin-btn-text').textContent = 'แอดมิน';
+      refreshEditableAttributes();
+    }
+
+    function refreshEditableAttributes() {
+      document.querySelectorAll('[data-editable="true"]').forEach(el => {
+        el.contentEditable = isEditMode ? 'true' : 'false';
+        el.onblur = () => {
+          if (el.dataset.path) {
+            setValueByPath(siteData, el.dataset.path, el.innerText.trim());
+            localStorage.setItem('boostmath_site_data', JSON.stringify(siteData));
+          }
+        };
+      });
+    }
+
+    function syncInlineEditsToState() {
+      document.querySelectorAll('[data-path]').forEach(el => {
+        if (el.getAttribute('contenteditable') === 'true') {
+          setValueByPath(siteData, el.dataset.path, el.innerText.trim());
+        }
+      });
+      localStorage.setItem('boostmath_site_data', JSON.stringify(siteData));
+    }
+
+    // ================= IMAGE UPLOAD & AUTO-RESIZE TO GOOGLE DRIVE =================
+    function triggerImageUpload(targetKey) {
+      if (!isEditMode) return;
+      pendingUploadTarget = targetKey;
+      document.getElementById('hidden-file-input').value = '';
+      document.getElementById('hidden-file-input').click();
+    }
+
+    async function handleFileSelected(event) {
+      const file = event.target.files[0];
+      if (!file || !pendingUploadTarget) return;
+
+      Swal.fire({
+        title: 'กำลังประมวลผลรูปภาพ...',
+        text: 'ระบบกำลังย่อขนาดและอัปโหลดรูปภาพ',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        // ย่อขนาดรูปภาพด้วย Canvas (ไม่เกิน 900px) เพื่อให้โหลดไวทั้งบน GitHub และ Google Drive
+        const base64DataUrl = await resizeImageFile(file, 900, 0.85);
+        let finalImageUrl = base64DataUrl;
+
+        const gasUrl = getGasUrl();
+        if (gasUrl) {
+          const res = await fetch(gasUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+              action: 'uploadImage',
+              folderUrl: getDriveFolderUrl(),
+              fileName: file.name,
+              mimeType: 'image/jpeg',
+              base64: base64DataUrl
+            })
+          });
+          const json = await res.json();
+          if (json.status === 'success' && json.url) {
+            finalImageUrl = json.url;
+          }
+        }
+
+        // อัปเดต URL รูปภาพเข้าสู่ State
+        if (pendingUploadTarget === 'logo') {
+          siteData.brand.logoUrl = finalImageUrl;
+        } else if (pendingUploadTarget === 'hero') {
+          siteData.home.heroImg = finalImageUrl;
+        } else if (pendingUploadTarget === 'qr') {
+          siteData.contactPage.qrImg = finalImageUrl;
+        } else if (pendingUploadTarget.startsWith('course:')) {
+          const idx = parseInt(pendingUploadTarget.split(':')[1], 10);
+          siteData.coursesPage.courses[idx].image = finalImageUrl;
+        } else if (pendingUploadTarget.startsWith('teacher:')) {
+          const idx = parseInt(pendingUploadTarget.split(':')[1], 10);
+          siteData.teachersPage.teachers[idx].image = finalImageUrl;
+        }
+
+        localStorage.setItem('boostmath_site_data', JSON.stringify(siteData));
+        renderAll();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'เปลี่ยนรูปภาพเรียบร้อย!',
+          text: 'อย่าลืมกดปุ่ม "บันทึกข้อมูล" เพื่ออัปเดตขึ้น Google Drive',
+          timer: 1800,
+          showConfirmButton: false
+        });
+      } catch (err) {
+        Swal.fire('เกิดข้อผิดพลาด', err.toString(), 'error');
+      }
+    }
+
+    function resizeImageFile(file, maxDim, quality) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width;
+            let h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ================= ADD / DELETE CARDS (FEATURES, COURSES, TEACHERS) =================
+    function addFeatureCard() {
+      syncInlineEditsToState();
+      siteData.home.features.push({
+        icon: 'fa-solid fa-lightbulb',
+        title: 'จุดเด่นใหม่ของสถาบัน (คลิกเพื่อแก้ไข)',
+        desc: 'คลิกที่ข้อความนี้เพื่อพิมพ์รายละเอียดจุดเด่นเพิ่มเติมของสถาบัน'
+      });
+      renderFeatures();
+      refreshEditableAttributes();
+    }
+
+    function deleteFeatureCard(idx) {
+      syncInlineEditsToState();
+      siteData.home.features.splice(idx, 1);
+      renderFeatures();
+      refreshEditableAttributes();
+    }
+
+    function openCourseModal() {
+      syncInlineEditsToState();
+      Swal.fire({
+        title: 'เพิ่มคอร์สเรียนใหม่',
+        html: `
+          <div class="text-left space-y-2.5 text-sm">
+            <div>
+              <label class="font-semibold text-xs">ระดับชั้น</label>
+              <select id="new-c-cat" class="w-full p-2 border rounded-lg">
+                <option value="ประถม">ประถม</option>
+                <option value="ม.ต้น">ม.ต้น</option>
+                <option value="ม.ปลาย">ม.ปลาย</option>
+                <option value="สอบเข้า">สอบเข้า</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-semibold text-xs">ชื่อคอร์สเรียน</label>
+              <input id="new-c-title" class="w-full p-2 border rounded-lg" placeholder="เช่น คอร์สติวเข้มคณิต สสวท. ป.6">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="font-semibold text-xs">ราคาคอร์ส</label>
+                <input id="new-c-price" class="w-full p-2 border rounded-lg" placeholder="2,900 บาท / คอร์ส">
+              </div>
+              <div>
+                <label class="font-semibold text-xs">ป้ายกำกับ (Badge)</label>
+                <input id="new-c-badge" class="w-full p-2 border rounded-lg" placeholder="คอร์สแนะนำ">
+              </div>
+            </div>
+            <div>
+              <label class="font-semibold text-xs">วัน-เวลาเรียน</label>
+              <input id="new-c-schedule" class="w-full p-2 border rounded-lg" placeholder="เสาร์ - อาทิตย์ (10:00 - 12:00 น.)">
+            </div>
+            <div>
+              <label class="font-semibold text-xs">รายละเอียดคอร์ส</label>
+              <textarea id="new-c-desc" rows="3" class="w-full p-2 border rounded-lg" placeholder="รายละเอียดเนื้อหาที่สอน..."></textarea>
+            </div>
+          </div>
+        `,
+        confirmButtonText: 'เพิ่มคอร์สเรียน',
+        confirmButtonColor: '#0284c7',
+        showCancelButton: true,
+        cancelButtonText: 'ยกเลิก',
+        preConfirm: () => {
+          const title = document.getElementById('new-c-title').value.trim();
+          if (!title) {
+            Swal.showValidationMessage('กรุณาระบุชื่อคอร์สเรียน');
+            return false;
+          }
+          return {
+            id: 'c_' + Date.now(),
+            category: document.getElementById('new-c-cat').value,
+            badge: document.getElementById('new-c-badge').value || 'คอร์สใหม่',
+            title,
+            price: document.getElementById('new-c-price').value || 'สอบถามราคา',
+            schedule: document.getElementById('new-c-schedule').value || 'เลือกเวลาเรียนได้',
+            desc: document.getElementById('new-c-desc').value || 'คลิกเพื่อแก้ไขรายละเอียดคอร์สเรียน',
+            image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80'
+          };
+        }
+      }).then(res => {
+        if (res.isConfirmed && res.value) {
+          siteData.coursesPage.courses.push(res.value);
+          renderCourses();
+          refreshEditableAttributes();
+        }
+      });
+    }
+
+    function deleteCourse(idx) {
+      syncInlineEditsToState();
+      siteData.coursesPage.courses.splice(idx, 1);
+      renderCourses();
+      refreshEditableAttributes();
+    }
+
+    function openTeacherModal() {
+      syncInlineEditsToState();
+      Swal.fire({
+        title: 'เพิ่มข้อมูลคุณครู',
+        html: `
+          <div class="text-left space-y-2.5 text-sm">
+            <div>
+              <label class="font-semibold text-xs">ชื่อคุณครู</label>
+              <input id="new-t-name" class="w-full p-2 border rounded-lg" placeholder="เช่น ครูพี่เอิร์ธ">
+            </div>
+            <div>
+              <label class="font-semibold text-xs">วิชา/ระดับชั้นที่เชี่ยวชาญ</label>
+              <input id="new-t-role" class="w-full p-2 border rounded-lg" placeholder="ผู้เชี่ยวชาญคณิตศาสตร์ประถม & ม.ต้น">
+            </div>
+            <div>
+              <label class="font-semibold text-xs">ประวัติการศึกษา</label>
+              <input id="new-t-edu" class="w-full p-2 border rounded-lg" placeholder="ปริญญาตรีครุศาสตร์ เอกคณิตศาสตร์">
+            </div>
+            <div>
+              <label class="font-semibold text-xs">สไตล์การสอน / แนะนำตัว</label>
+              <textarea id="new-t-bio" rows="3" class="w-full p-2 border rounded-lg" placeholder="ใจดี สอนสนุก เน้นเทคนิคเข้าใจง่าย..."></textarea>
+            </div>
+          </div>
+        `,
+        confirmButtonText: 'เพิ่มคุณครู',
+        confirmButtonColor: '#0284c7',
+        showCancelButton: true,
+        cancelButtonText: 'ยกเลิก',
+        preConfirm: () => {
+          const name = document.getElementById('new-t-name').value.trim();
+          if (!name) {
+            Swal.showValidationMessage('กรุณาระบุชื่อคุณครู');
+            return false;
+          }
+          return {
+            id: 't_' + Date.now(),
+            name,
+            role: document.getElementById('new-t-role').value || 'ติวเตอร์คณิตศาสตร์',
+            education: document.getElementById('new-t-edu').value || 'ปริญญาตรีสาขาคณิตศาสตร์',
+            bio: document.getElementById('new-t-bio').value || 'คลิกเพื่อแก้ไขข้อมูลแนะนำตัวคุณครู',
+            image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'
+          };
+        }
+      }).then(res => {
+        if (res.isConfirmed && res.value) {
+          siteData.teachersPage.teachers.push(res.value);
+          renderTeachers();
+          refreshEditableAttributes();
+        }
+      });
+    }
+
+    function deleteTeacher(idx) {
+      syncInlineEditsToState();
+      siteData.teachersPage.teachers.splice(idx, 1);
+      renderTeachers();
+      refreshEditableAttributes();
+    }
+
+    // ================= THEME & GOOGLE DRIVE DATABASE SETTINGS MODAL =================
+    function openDesignModal() {
+      syncInlineEditsToState();
+      Swal.fire({
+        title: 'ตั้งค่าธีมสี & ฐานข้อมูล Google Drive',
+        html: `
+          <div class="text-left space-y-4 text-sm mt-2">
+            <div class="grid grid-cols-2 gap-3 p-3 bg-slate-100 rounded-xl">
+              <div>
+                <label class="font-bold text-xs block mb-1">สีหลัก (Primary Blue)</label>
+                <input id="cfg-primary" type="color" value="${siteData.theme?.primaryColor || '#0284c7'}" class="w-full h-10 rounded cursor-pointer">
+              </div>
+              <div>
+                <label class="font-bold text-xs block mb-1">สีเน้น (Accent Gold)</label>
+                <input id="cfg-accent" type="color" value="${siteData.theme?.accentColor || '#f59e0b'}" class="w-full h-10 rounded cursor-pointer">
+              </div>
+            </div>
+
+            <div>
+              <label class="font-bold text-xs block mb-1">ลิงก์โฟลเดอร์ Google Drive (ฐานข้อมูล)</label>
+              <input id="cfg-folder" type="text" value="${getDriveFolderUrl()}" placeholder="วางลิงก์โฟลเดอร์ Google Drive ที่นี่" class="w-full p-2.5 border rounded-xl text-xs">
+            </div>
+
+            <div>
+              <label class="font-bold text-xs block mb-1">Google Apps Script Web App URL</label>
+              <input id="cfg-gas" type="text" value="${getGasUrl()}" placeholder="https://script.google.com/macros/s/.../exec" class="w-full p-2.5 border rounded-xl text-xs">
+              <p class="text-[11px] text-slate-500 mt-1">เมื่อใส่ Web App URL แล้ว ทุกครั้งที่กดบันทึก ข้อมูลจะถูกเซฟลงโฟลเดอร์ Google Drive ทันที</p>
+            </div>
+          </div>
+        `,
+        confirmButtonText: 'บันทึกการตั้งค่า',
+        confirmButtonColor: '#0284c7',
+        showCancelButton: true,
+        cancelButtonText: 'ปิด'
+      }).then(res => {
+        if (res.isConfirmed) {
+          siteData.theme = {
+            primaryColor: document.getElementById('cfg-primary').value,
+            accentColor: document.getElementById('cfg-accent').value
+          };
+          localStorage.setItem('boostmath_folder_url', document.getElementById('cfg-folder').value.trim());
+          localStorage.setItem('boostmath_gas_url', document.getElementById('cfg-gas').value.trim());
+          localStorage.setItem('boostmath_site_data', JSON.stringify(siteData));
+          applyCustomColors();
+          Swal.fire('สำเร็จ', 'อัปเดตธีมสีและการเชื่อมต่อเรียบร้อยแล้ว', 'success');
+        }
+      });
+    }
+
+    // บันทึกข้อมูลทั้งหมดขึ้น Google Drive Folder
+    async function saveAllToCloud() {
+      syncInlineEditsToState();
+      localStorage.setItem('boostmath_site_data', JSON.stringify(siteData));
+
+      const gasUrl = getGasUrl();
+      if (!gasUrl) {
+        Swal.fire({
+          icon: 'info',
+          title: 'บันทึกในเบราว์เซอร์เรียบร้อย!',
+          text: 'หากต้องการให้ซิงก์เข้าโฟลเดอร์ Google Drive อัตโนมัติ กรุณากดปุ่ม "ตั้งค่าสี & Drive API" เพื่อใส่ Web App URL',
+          confirmButtonColor: '#0284c7'
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: 'กำลังบันทึกข้อมูลลง Google Drive...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        const res = await fetch(gasUrl, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'saveSiteData',
+            folderUrl: getDriveFolderUrl(),
+            siteData: siteData
+          })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          Swal.fire('บันทึกสำเร็จ!', 'ข้อมูลและรูปภาพทั้งหมดถูกอัปเดตลงในโฟลเดอร์ Google Drive เรียบร้อยแล้ว', 'success');
+        } else {
+          throw new Error(json.message);
+        }
+      } catch (err) {
+        Swal.fire('เกิดข้อผิดพลาดในการซิงก์ Cloud', err.toString(), 'error');
+      }
+    }
+
+    // ================= STUDENT LEAD SUBMISSION =================
+    function selectCourseToApply(courseName) {
+      navigatePage('contact');
+      setTimeout(() => {
+        const input = document.getElementById('lead-course');
+        if (input) {
+          input.value = courseName;
+          input.focus();
+        }
+      }, 300);
+    }
+
+    async function submitStudentLead(e) {
+      e.preventDefault();
+      const lead = {
+        name: document.getElementById('lead-name').value.trim(),
+        phone: document.getElementById('lead-phone').value.trim(),
+        course: document.getElementById('lead-course').value.trim(),
+        message: document.getElementById('lead-message').value.trim()
+      };
+
+      const gasUrl = getGasUrl();
+      if (gasUrl) {
+        Swal.fire({
+          title: 'กำลังส่งข้อมูล...',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+        try {
+          await fetch(gasUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+              action: 'submitLead',
+              folderUrl: getDriveFolderUrl(),
+              lead
+            })
+          });
+        } catch (err) {}
+      }
+
+      e.target.reset();
+      Swal.fire({
+        icon: 'success',
+        title: 'ส่งข้อมูลเรียบร้อยแล้ว!',
+        text: 'ขอบคุณที่สนใจเรียนกับ BOOST MATH คุณครูจะติดต่อกลับโดยเร็วที่สุดครับ',
+        confirmButtonColor: '#0284c7'
+      });
+    }
+
+    // Helper functions สำหรับจัดการ Object Path
+    function getValueByPath(obj, path) {
+      return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    }
+    function setValueByPath(obj, path, value) {
+      const parts = path.split('.');
+      const last = parts.pop();
+      const target = parts.reduce((acc, part) => acc && acc[part], obj);
+      if (target && last !== undefined) {
+        target[last] = value;
+      }
+    }
+  </script>
+</body>
+</html>
